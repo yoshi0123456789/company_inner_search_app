@@ -52,7 +52,6 @@ if not "initialized" in st.session_state:
     st.session_state.initialized = True
     logger.info(ct.APP_BOOT_MESSAGE)
 
-
 ############################################################
 # 4. 初期表示
 ############################################################

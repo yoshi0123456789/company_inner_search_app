@@ -27,7 +27,6 @@ import constants as ct
 # 「.env」ファイルで定義した環境変数の読み込み
 load_dotenv()
 
-
 ############################################################
 # 関数定義
 ############################################################
@@ -38,12 +37,16 @@ def initialize():
     """
     # 初期化データの用意
     initialize_session_state()
+    #st.error("# 初期化データの用意")
     # ログ出力用にセッションIDを生成
     initialize_session_id()
+    #st.error("# ログ出力用にセッションIDを生成")
     # ログ出力の設定
     initialize_logger()
+    #st.error("# ログ出力の設定")
     # RAGのRetrieverを作成
     initialize_retriever()
+    #st.error("# RAGのRetrieverを作成")
 
 
 def initialize_logger():
@@ -99,9 +102,54 @@ def initialize_session_id():
 
 
 def initialize_retriever():
-    """
-    画面読み込み時にRAGのRetriever（ベクターストアから検索するオブジェクト）を作成
-    """
+    print("=== initialize_retriever(): 開始 ===")
+    logger = logging.getLogger(ct.LOGGER_NAME)
+
+    try:
+        if "retriever" in st.session_state:
+            print("retriever はすでに存在します。スキップ。")
+            return
+
+        print("データソース読み込み開始")
+        docs_all = load_data_sources()
+        print(f"{len(docs_all)} 件のドキュメントを読み込みました")
+
+        for doc in docs_all:
+            doc.page_content = adjust_string(doc.page_content)
+            for key in doc.metadata:
+                doc.metadata[key] = adjust_string(doc.metadata[key])
+        
+        print("埋め込みモデルを初期化")
+        embeddings = OpenAIEmbeddings()
+
+        print("チャンク分割を設定")
+        text_splitter = CharacterTextSplitter(
+            chunk_size=500,
+            chunk_overlap=50,
+            separator="\n"
+        )
+
+        print("ドキュメント分割を実行")
+        splitted_docs = text_splitter.split_documents(docs_all)
+
+        print(f"{len(splitted_docs)} 件のチャンクに分割されました")
+
+        print("Chromaベクターストア作成")
+        db = Chroma.from_documents(splitted_docs, embedding=embeddings)
+
+        print("Retrieverを作成してセッションに格納")
+        st.session_state.retriever = db.as_retriever(search_kwargs={"k": 3})
+
+        print("=== initialize_retriever(): 完了 ===")
+
+    except Exception as e:
+        print("❌ initialize_retriever() でエラー:", e)
+        st.error(f"初期化処理に失敗しました: {e}")
+        raise
+
+
+""" def initialize_retriever():
+    # 画面読み込み時にRAGのRetriever（ベクターストアから検索するオブジェクト）を作成
     # ロガーを読み込むことで、後続の処理中に発生したエラーなどがログファイルに記録される
     logger = logging.getLogger(ct.LOGGER_NAME)
 
@@ -136,7 +184,7 @@ def initialize_retriever():
 
     # ベクターストアを検索するRetrieverの作成
     st.session_state.retriever = db.as_retriever(search_kwargs={"k": 3})
-
+ """
 
 def initialize_session_state():
     """
