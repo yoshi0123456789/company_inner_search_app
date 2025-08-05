@@ -13,6 +13,13 @@ from langchain_community.document_loaders.csv_loader import CSVLoader
 # 共通変数の定義
 ############################################################
 
+# RAG の関連ドキュメント取得数
+RETRIEVER_TOP_K = 5
+
+# チャンク分割設定
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 50
+
 # ==========================================
 # 画面表示系
 # ==========================================

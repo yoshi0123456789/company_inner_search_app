@@ -123,9 +123,16 @@ def initialize_retriever():
         embeddings = OpenAIEmbeddings()
 
         print("チャンク分割を設定")
+        """
         text_splitter = CharacterTextSplitter(
             chunk_size=500,
             chunk_overlap=50,
+            separator="\n"
+        ) 
+        """
+        text_splitter = CharacterTextSplitter(
+            chunk_size=ct.CHUNK_SIZE,
+            chunk_overlap=ct.CHUNK_OVERLAP,
             separator="\n"
         )
 
@@ -138,7 +145,9 @@ def initialize_retriever():
         db = Chroma.from_documents(splitted_docs, embedding=embeddings)
 
         print("Retrieverを作成してセッションに格納")
-        st.session_state.retriever = db.as_retriever(search_kwargs={"k": 3})
+        #st.session_state.retriever = db.as_retriever(search_kwargs={"k": 3})
+        st.session_state.retriever = db.as_retriever(search_kwargs={"k": ct.RETRIEVER_TOP_K})
+
 
         print("=== initialize_retriever(): 完了 ===")
 
