@@ -32,7 +32,6 @@ st.set_page_config(
 # ログ出力を行うためのロガーの設定
 logger = logging.getLogger(ct.LOGGER_NAME)
 
-
 ############################################################
 # 3. 初期化処理
 ############################################################
@@ -55,14 +54,16 @@ if not "initialized" in st.session_state:
 ############################################################
 # 4. 初期表示
 ############################################################
-# タイトル表示
-cn.display_app_title()
+# サイドバーに表示
+with st.sidebar:
+    # タイトル表示
+    cn.display_app_title()
 
-# モード表示
-cn.display_select_mode()
+    # モード表示
+    cn.display_select_mode()
 
-# AIメッセージの初期表示
-cn.display_initial_ai_message()
+    # AIメッセージの初期表示
+    cn.display_initial_ai_message()
 
 
 ############################################################
