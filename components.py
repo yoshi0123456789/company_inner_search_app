@@ -9,10 +9,10 @@ import streamlit as st
 import utils
 import constants as ct
 
-
 ############################################################
 # 関数定義
 ############################################################
+
 def display_app_title():
     """
     タイトル表示
